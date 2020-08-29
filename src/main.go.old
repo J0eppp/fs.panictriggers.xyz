@@ -1,0 +1,257 @@
+package main
+
+import (
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	uuid "github.com/satori/go.uuid"
+	"golang.org/x/crypto/bcrypt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"time"
+	"./database"
+
+	"github.com/gorilla/mux"
+	_ "github.com/mattn/go-sqlite3"
+)
+
+var db *sql.DB
+
+func dumpUsers() {
+	rows, _ := db.Query("SELECT * FROM users")
+	defer rows.Close()
+	for rows.Next() {
+		var user database.User
+
+		rows.Scan(&user.ID, &user.Username, &user.Email, &user.Hash, &user.SessionToken, &user.SessionExpires)
+
+		fmt.Printf("%+v\n", user)
+	}
+}
+
+type file struct {
+	ID         uint   `json:"id"`
+	Location   string `json:"location"`
+	Filename   string `json:"filename"`
+	Public     bool   `json:"public"`
+	Owner      uint   `json:"owner"`
+	RandomName string `json:"randomName"`
+}
+
+//type user struct {
+//	ID             uint   `json:"id"`
+//	Username       string `json:"username"`
+//	Email          string `json:"email"`
+//	Hash           string `json:"-"`
+//	SessionToken   string `json:"sessionToken"`
+//	SessionExpires int64 `json:"sessionExpires"`
+//}
+
+type session struct {
+	SessionToken string `json:"sessionToken"`
+	SessionExpires int64 `json:"sessionExpires"`
+}
+
+type httpRes struct {
+	Success bool `json:"success"`
+	Error bool `json:"error"`
+	Message string `json:"message"`
+}
+
+func newSession() session{
+	token, _ := uuid.NewV4()
+	return session{
+		SessionToken: token.String(),
+		SessionExpires: time.Now().Unix() + 60 * 60 * 24, // Session token will be valid for one day
+	}
+}
+
+func apiGET(w http.ResponseWriter, r *http.Request) {
+	//w.Header().Add("status", "401")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "API!!")
+}
+
+func apiLoginPOST(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var body struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	b, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(b, &body)
+
+	rows, err := db.Query("SELECT * FROM users WHERE username = ?", body.Username)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer rows.Close()
+	rows.Next()
+	var user database.User
+
+
+	rows.Scan(&user.ID, &user.Username, &user.Email, &user.Hash, &user.SessionToken, &user.SessionExpires)
+
+	if user.ID == 0 {
+		// There is no user with this username, send error
+		var res httpRes = httpRes{
+			Success: false,
+			Error: true,
+			Message: "The username or password you entered is wrong, try again please!",
+		}
+		//w.Header().Add("status", "401")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	// Should check password here
+	var password []byte = []byte(body.Password)
+	var hash []byte = []byte(user.Hash)
+	err = bcrypt.CompareHashAndPassword(hash, password)
+	if err != nil {
+		// Incorrect password
+		var res httpRes = httpRes{
+			Success: false,
+			Error: true,
+			Message: "The username or password you entered is wrong, try again please!",
+		}
+		//w.Header().Add("status", "401")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	// Password is correct
+
+	// Create session and send success message to client with the session info
+	var s session = newSession()
+	var res struct {
+		Success bool `json:"success"`
+		Error bool `json:"error"`
+		Message string `json:"message"`
+		Session session `json:"session"`
+	}
+
+	res.Success = true
+	res.Error = false
+	res.Message = "You logged in successfully!"
+	res.Session = s
+
+	var cookie http.Cookie = http.Cookie{
+		Name: "sessionToken",
+		Value: s.SessionToken,
+		Path: "/",
+		//Domain: "fs.panictriggers.xyz", enable this when using the domain, doesn´t work for localhost
+		Expires: time.Unix(s.SessionExpires, 0),
+	}
+	http.SetCookie(w, &cookie)
+
+	json.NewEncoder(w).Encode(res)
+
+	// Save the session info
+	statement, _ := db.Prepare("UPDATE users SET session_token = '?', session_expires = '?' WHERE username = '?'")
+	statement.Exec(s.SessionToken, s.SessionExpires, body.Username)
+	dumpUsers()
+}
+
+func apiMeGET(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	cookie, err := r.Cookie("sessionToken")
+
+	if err != nil {
+		// Session cookie is not set
+		var res httpRes = httpRes{
+			Success: false,
+			Error: true,
+			Message: "You are not logged in!",
+		}
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	if len(cookie.Value) == 0 {
+		// Session cookie is not set
+		var res httpRes = httpRes{
+			Success: false,
+			Error: true,
+			Message: "You are not logged in!",
+		}
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	if cookie.Expires.Unix() >= time.Now().Unix() {
+		// Session is expired
+		var res httpRes = httpRes{
+			Success: false,
+			Error: true,
+			Message: "Your session has been expired, please log back in!",
+		}
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	// Check the expire time in the db, might have edited the cookie
+	rows, _ := db.Query("SELECT session_expires FROM users WHERE session_token = ?", cookie.Value)
+	defer rows.Close()
+	rows.Next()
+	var sessionExpires int64
+	rows.Scan(&sessionExpires)
+	if sessionExpires >= time.Now().Unix() {
+		// Session has indeed been expired
+		var res httpRes = httpRes{
+			Success: false,
+			Error: true,
+			Message: "Your session has been expired, please log back in!",
+		}
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	// Session is valid, get the user
+	rows, _ = db.Query("SELECT `id`, `username`, `email`, `session_token`, `session_expires` FROM users WHERE session_token = ?", cookie.Value)
+	defer rows.Close()
+	var user database.User
+	rows.Scan(&user.ID, &user.Username, &user.Email, &user.SessionToken, &user.SessionExpires)
+	json.NewEncoder(w).Encode(user)
+}
+
+func main() {
+	db, _ := sql.Open("sqlite3", "./db.db")
+
+	// db setup
+	s, _ := db.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username VARCHAR(64), email VARCHAR(128), hash VARCHAR(512), session_token VARCHAR(128), session_expires integer)")
+	s.Exec()
+	s1, _ := db.Prepare("CREATE TABLE IF NOT EXISTS files (id INTEGER PRIMARY KEY, location VARCHAR(512), filename VARCHAR(512), public BOOLEAN, owner INTEGER, random_name VARCHAR(128))")
+	s1.Exec()
+	//var password []byte = []byte("Test")
+	//hash, _ := bcrypt.GenerateFromPassword(password, 8)
+	//fmt.Println(len(hash))
+	//s2, _ := db.Prepare("INSERT INTO users (username, email, hash, session_token, session_expires) VALUES ('J0eppp', 'joep.van.dijk4@gmail.com', ?, '', '')")
+	//s2.Exec(string(hash))
+
+	dumpUsers()
+
+	router := mux.NewRouter().StrictSlash(true)
+
+	apiRouter := router.PathPrefix("/api").Subrouter()
+	apiRouter.HandleFunc("/", apiGET).Methods("GET")
+	apiRouter.HandleFunc("/login", apiLoginPOST).Methods("POST")
+	apiRouter.HandleFunc("/me", apiMeGET).Methods("GET")
+
+	log.Fatal(http.ListenAndServe(":80", logger(router)))
+}
+
+func logger(next http.Handler) http.Handler {
+	return http.HandlerFunc(
+			func(w http.ResponseWriter, r *http.Request) {
+				next.ServeHTTP(w, r)
+				fmt.Printf("[" + time.Now().Format(time.UnixDate) + "] " + r.RemoteAddr + " [" + r.Method + "] " + /*"[" +  + "] " +*/ r.URL.String() + "\n")
+			},
+		)
+}
