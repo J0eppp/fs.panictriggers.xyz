@@ -10,6 +10,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -194,6 +197,8 @@ func apiMeGET(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	setupCloseHandler()
+
 	d, err := sql.Open("mysql",  "root:Test123@(localhost:3306)/fs.panictriggers.xyz")
 	if err != nil {
 		panic(err)
@@ -208,6 +213,10 @@ func main() {
 	apiRouter.HandleFunc("/", apiGET).Methods("GET")
 	apiRouter.HandleFunc("/login", apiLoginPOST).Methods("POST")
 	apiRouter.HandleFunc("/me", apiMeGET).Methods("GET")
+
+	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/index.html")
+	})
 
 	log.Fatal(http.ListenAndServe(":80", logger(router)))
 }
@@ -244,4 +253,15 @@ func setupDb() {
 	if err != nil {
 		panic(err.Error())
 	}
+}
+
+func setupCloseHandler() {
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		fmt.Println("\r- Ctrl+C has been pressed, closing the program")
+		db.DB.Close()
+		os.Exit(0)
+	}()
 }
