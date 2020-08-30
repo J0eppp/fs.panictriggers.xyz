@@ -204,7 +204,6 @@ func apiLoginPOST(w http.ResponseWriter, r *http.Request) {
 	defer statement.Close()
 	statement.Exec(s.SessionToken, s.SessionExpires, body.Username)
 	tx.Commit()
-	dumpUsers()
 }
 
 func apiMeGET(w http.ResponseWriter, r *http.Request) {
