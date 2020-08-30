@@ -97,8 +97,7 @@ func authenticate(next http.Handler) http.Handler {
 func createServerName() uuid.UUID {
 	_uuid, _ := uuid.NewV4()
 	rows, _ := db.DB.Query("SELECT id FROM files WHERE server_name = ?", _uuid.String())
-	r := rows.Next()
-	fmt.Println(r)
+	rows.Next()
 	var _id int64
 	rows.Scan(&_id)
 	if _id != 0 {
@@ -317,7 +316,6 @@ func apiUploadPOST(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	fmt.Printf("%+v\n", f)
 	json.NewEncoder(w).Encode(f)
 }
 
@@ -442,7 +440,7 @@ func apiFileGET(w http.ResponseWriter, r *http.Request) {
 func main() {
 	setupCloseHandler()
 
-	d, err := sql.Open("mysql",  "root:Test123@(localhost:3306)/fs.panictriggers.xyz")
+	d, err := sql.Open("mysql",  "root:Test123@unix(/var/run/mysqld/mysqld.sock)/fs.panictriggers.xyz")
 	if err != nil {
 		panic(err)
 	}
