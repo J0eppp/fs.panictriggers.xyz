@@ -1,10 +1,10 @@
 package database
 
 type File struct {
-	ID         uint   `json:"id"`
+	ID         int64  `json:"id"`
 	Location   string `json:"location"`
 	Filename   string `json:"filename"`
 	Public     bool   `json:"public"`
-	Owner      uint   `json:"owner"`
+	Owner      int64  `json:"owner"`
 	ServerName string `json:"serverName"`
 }

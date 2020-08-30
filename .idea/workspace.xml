@@ -20,8 +20,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a789453a-ad9d-4ee5-87be-92f237432947" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/static/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/database/file.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/file.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -40,6 +41,13 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="hiddenUrls">
+      <set>
+        <option value="https://github.com/panictriggers/fs.panictriggers.xyz" />
+      </set>
+    </option>
+  </component>
   <component name="ProjectId" id="1gmEUdD9aRuzo7zg4AEo5aMrR5y" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -49,6 +57,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
@@ -56,6 +65,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="SQL Dialects" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
@@ -71,5 +81,20 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="1970" y="462" width="732" height="637" key="#Inspections" timestamp="1598797962938">
+      <screen x="1360" y="228" width="1920" height="1080" />
+    </state>
+    <state x="1970" y="462" width="732" height="637" key="#Inspections/1360.228.1920.1080/0.255.1360.513@1360.228.1920.1080" timestamp="1598797962938" />
+    <state x="1830" y="415" key="SettingsEditor" timestamp="1598810885489">
+      <screen x="1360" y="228" width="1920" height="1080" />
+    </state>
+    <state x="1830" y="415" key="SettingsEditor/1360.228.1920.1080/0.255.1360.513@1360.228.1920.1080" timestamp="1598810885489" />
+    <state x="2066" y="694" width="540" height="172" key="vcs.readOnlyHandler.ReadOnlyStatusDialog" timestamp="1598812939325">
+      <screen x="1360" y="228" width="1920" height="1080" />
+    </state>
+    <state x="2066" y="694" width="540" height="172" key="vcs.readOnlyHandler.ReadOnlyStatusDialog/1360.228.1920.1080/0.255.1360.513@1360.228.1920.1080" timestamp="1598812939325" />
   </component>
 </project>
