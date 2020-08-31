@@ -20,9 +20,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a789453a-ad9d-4ee5-87be-92f237432947" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/static/file/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/static/css/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/static/css/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/static/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/static/js/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/static/js/index.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,10 +35,10 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="HTML File" />
         <option value="CSS File" />
-        <option value="JavaScript File" />
         <option value="HTTP Request" />
+        <option value="JavaScript File" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -123,10 +126,10 @@
       <screen x="1360" y="228" width="1920" height="1080" />
     </state>
     <state x="1970" y="462" width="732" height="637" key="#Inspections/1360.228.1920.1080/0.255.1360.513@1360.228.1920.1080" timestamp="1598797962938" />
-    <state x="2023" y="582" width="627" height="396" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1598868458587">
+    <state x="2023" y="582" width="627" height="396" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1598881440124">
       <screen x="1360" y="228" width="1920" height="1080" />
     </state>
-    <state x="2023" y="582" width="627" height="396" key="#com.intellij.fileTypes.FileTypeChooser/1360.228.1920.1080/0.255.1360.513@1360.228.1920.1080" timestamp="1598868458587" />
+    <state x="2023" y="582" width="627" height="396" key="#com.intellij.fileTypes.FileTypeChooser/1360.228.1920.1080/0.255.1360.513@1360.228.1920.1080" timestamp="1598881440124" />
     <state width="1831" height="278" key="GridCell.Tab.0.bottom" timestamp="1598867036432">
       <screen x="1360" y="228" width="1920" height="1080" />
     </state>
@@ -147,6 +150,10 @@
       <screen x="1360" y="228" width="1920" height="1080" />
     </state>
     <state x="1830" y="415" key="SettingsEditor/1360.228.1920.1080/0.255.1360.513@1360.228.1920.1080" timestamp="1598810885489" />
+    <state x="2004" y="485" width="672" height="678" key="search.everywhere.popup" timestamp="1598870848591">
+      <screen x="1360" y="228" width="1920" height="1080" />
+    </state>
+    <state x="2004" y="485" width="672" height="678" key="search.everywhere.popup/1360.228.1920.1080/0.255.1360.513@1360.228.1920.1080" timestamp="1598870848591" />
     <state x="2066" y="694" width="540" height="172" key="vcs.readOnlyHandler.ReadOnlyStatusDialog" timestamp="1598812939325">
       <screen x="1360" y="228" width="1920" height="1080" />
     </state>

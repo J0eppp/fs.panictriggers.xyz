@@ -12,3 +12,22 @@ input {
     border: #ffffff 2px solid;
     border-radius: 4px;
 }
+
+a {
+    display: block;
+    color: #ffffff;
+
+    background-color: #9f9f9f;
+    /*border: 2px solid white;*/
+    border-radius: 5px;
+    margin-top: 5px;
+    margin-left: 20px;
+    margin-right: 100px;
+    width: 300px;
+    padding: 3px;
+}
+
+a:hover {
+    background-color: white;
+    color: black;
+}

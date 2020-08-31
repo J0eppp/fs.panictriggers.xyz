@@ -27,16 +27,34 @@ var db *database.Database
 
 func sendMail(recipient string, title string, body string) error {
 	// Set up authentication information
-	auth := smtp.PlainAuth("fs", "fs@panictriggers.xyz", "verysafefspassword", "smtp.domain.com")
+	from := "fs@panictriggers.xyz"
+	auth := smtp.PlainAuth("fs", from, "verysafefspassword", "smtp.domain.com")
 
 	// Connect to the server, authenticate, set the sender and recipient and send the email
 	to := []string{recipient}
 	msg := []byte("To: " + recipient + "\r\n" +
+			"From: " + from + "\r\n" +
 			"Subject: " + title + "\n\r" +
 			"\r\n" +
 			body + "\n\r")
 
-	err := smtp.SendMail("mail.domain.com:25", auth, "fs@panictriggers.xyz", to, msg)
+	err := smtp.SendMail("smtp.domain.com:587", auth, from, to, msg)
+	return err
+}
+
+func sendMail2(recipient string, title string, body string) error {
+	// Set up authentication information
+	auth := smtp.PlainAuth("", "security@panictriggers.xyz", "pwd", "smtp.domain.com")
+
+	// Connect to the server, authenticate, set the sender and recipient and send the email
+	to := []string{recipient}
+	msg := []byte("To: " + recipient + "\r\n" +
+		"From: " + "security@panictriggers.xyz\r\n" +
+		"Subject: " + title + "\n\r" +
+		"\r\n" +
+		body + "\n\r")
+
+	err := smtp.SendMail("smtp.domain.com:587", auth, "security@panictriggers.xyz", to, msg)
 	return err
 }
 
@@ -558,11 +576,45 @@ func apiRegisterPOST(w http.ResponseWriter, r *http.Request) {
 		Success: true,
 		Message: "You have successfully registered a user!",
 	}
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(res)
+}
+
+func apiFilesGET(w http.ResponseWriter, r *http.Request) {
+	// User has already been authenticated with the `authenticate` middleware function
+	w.Header().Set("Content-Type", "application/json")
+	cookie, _ := r.Cookie("sessionToken")
+
+	// Get the UID
+	rows, _ := db.DB.Query("SELECT id FROM users where session_token = ?", cookie.Value)
+	rows.Next()
+	var uid int64
+	rows.Scan(&uid)
+	defer rows.Close()
+
+
+	rows, _ = db.DB.Query("SELECT * FROM files WHERE owner = ? OR public = 1", uid)
+	defer rows.Close()
+
+	var files []database.File
+
+	for rows.Next() {
+		var f database.File
+		rows.Scan(&f.ID, &f.Location, &f.Filename, &f.Public, &f.Owner, &f.ServerName)
+		files = append(files, f)
+	}
+
+	json.NewEncoder(w).Encode(files)
 }
 
 func main() {
 	setupCloseHandler()
+
+	//e := sendMail2("joep@panictriggers.xyz", "Go test mail", "Dit\nis\neen\ntest\n!")
+	//
+	//if e != nil {
+	//	panic(e)
+	//}
 
 	d, err := sql.Open("mysql",  "root:Test123@unix(/var/run/mysqld/mysqld.sock)/fs.panictriggers.xyz")
 	if err != nil {
@@ -584,8 +636,12 @@ func main() {
 
 	apiRouter.HandleFunc("/", apiGET).Methods("GET")
 
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	authenticatedRouter.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./static/index.html")
+	}).Methods("GET")
+
+	authenticatedRouter.HandleFunc("/file", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/file/index.html")
 	}).Methods("GET")
 
 	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
@@ -597,6 +653,7 @@ func main() {
 	apiAuthenticatedRouter.HandleFunc("/me", apiMeGET).Methods("GET")
 	apiAuthenticatedRouter.HandleFunc("/me/files", apiMeFilesGET).Methods("GET")
 	apiAuthenticatedRouter.HandleFunc("/publicFiles", apiPublicFilesGET).Methods("GET")
+	apiAuthenticatedRouter.HandleFunc("/files", apiFilesGET).Methods("GET")
 	apiAuthenticatedRouter.HandleFunc("/file", apiFileGET).Methods("GET")
 	apiAuthenticatedRouter.HandleFunc("/upload", apiUploadPOST).Methods("POST")
 
