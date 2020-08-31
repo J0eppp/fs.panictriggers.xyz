@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/smtp"
 	"os"
 	"os/signal"
 	"strconv"
@@ -23,6 +24,21 @@ import (
 )
 
 var db *database.Database
+
+func sendMail(recipient string, title string, body string) error {
+	// Set up authentication information
+	auth := smtp.PlainAuth("fs", "fs@panictriggers.xyz", "verysafefspassword", "smtp.domain.com")
+
+	// Connect to the server, authenticate, set the sender and recipient and send the email
+	to := []string{recipient}
+	msg := []byte("To: " + recipient + "\r\n" +
+			"Subject: " + title + "\n\r" +
+			"\r\n" +
+			body + "\n\r")
+
+	err := smtp.SendMail("mail.domain.com:25", auth, "fs@panictriggers.xyz", to, msg)
+	return err
+}
 
 func logger(next http.Handler) http.Handler {
 	return http.HandlerFunc(
@@ -560,9 +576,11 @@ func main() {
 	authenticatedRouter.Use(authenticateFE)
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
+	apiRouter.Use(logger)
 
 	apiAuthenticatedRouter := router.PathPrefix("/api").Subrouter()
 	apiAuthenticatedRouter.Use(authenticate)
+	apiAuthenticatedRouter.Use(logger)
 
 	apiRouter.HandleFunc("/", apiGET).Methods("GET")
 
@@ -588,7 +606,7 @@ func main() {
 	//	http.ServeFile(w, r, "./static/index.html")
 	//})
 
-	log.Fatal(http.ListenAndServe(":80", logger(router)))
+	log.Fatal(http.ListenAndServe(":80", router))
 }
 
 func dumpUsers() {
