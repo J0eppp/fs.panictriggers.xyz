@@ -477,6 +477,74 @@ func apiFileGET(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+func apiRegisterPOST(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var body struct {
+		Username string `json:"username"`
+		Email string `json:"email"`
+		Password string `json:"password"`
+		Secret string `json:"secret"`
+	}
+
+	b, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(b, &body)
+
+	s, _ := ioutil.ReadFile("../registerSecret")
+	secret := string(s)
+
+	if body.Secret != secret {
+		var res = httpRes{
+			Success: false,
+			Error: true,
+			Message: "The secret you provided is wrong!",
+		}
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	// Secret is correct, continue registering
+	// Check if username or email already exists
+	rows, _ := db.DB.Query("SELECT id FROM users WHERE username = ? OR email = ?", body.Username, body.Email)
+	defer rows.Close()
+	rows.Next()
+	var id int64
+	rows.Scan(&id)
+
+	if id != 0 {
+		// Username or email already exists
+		var res = httpRes{
+			Success: false,
+			Error: true,
+			Message: "There already exists an account with that username or email address!",
+		}
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	// All good, create an hash and save the user
+	// Get the new ID
+	rows, _ = db.DB.Query("SELECT id FROM users ORDER BY id DESC LIMIT 0, 1")
+	defer rows.Close()
+	rows.Next()
+	var uid int64
+	rows.Scan(&uid)
+	uid++
+	hash, _ := bcrypt.GenerateFromPassword([]byte(body.Password), 8)
+	fmt.Println(len(hash))
+	statement, _ := db.DB.Prepare("INSERT INTO users (id, username, email, hash, session_token, session_expires) VALUES (?, ?, ?, ?, '', 0)")
+	_, _ = statement.Exec(uid, body.Username, body.Email, string(hash))
+	defer statement.Close()
+
+	// User saved
+	var res = httpRes{
+		Error: false,
+		Success: true,
+		Message: "You have successfully registered a user!",
+	}
+	json.NewEncoder(w).Encode(res)
+}
+
 func main() {
 	setupCloseHandler()
 
@@ -507,6 +575,7 @@ func main() {
 	}).Methods("GET")
 
 	apiRouter.HandleFunc("/login", apiLoginPOST).Methods("POST")
+	apiRouter.HandleFunc("/register", apiRegisterPOST).Methods("POST")
 	apiAuthenticatedRouter.HandleFunc("/me", apiMeGET).Methods("GET")
 	apiAuthenticatedRouter.HandleFunc("/me/files", apiMeFilesGET).Methods("GET")
 	apiAuthenticatedRouter.HandleFunc("/publicFiles", apiPublicFilesGET).Methods("GET")

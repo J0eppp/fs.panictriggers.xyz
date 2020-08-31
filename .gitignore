@@ -21,3 +21,5 @@ files
 localhost.key
 localhost.crt
 localhost.csr
+
+registerSecret
