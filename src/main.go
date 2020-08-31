@@ -648,6 +648,10 @@ func main() {
 		http.ServeFile(w, r, "./static/login/index.html")
 	}).Methods("GET")
 
+	router.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/favicon.ico")
+	}).Methods("GET")
+
 	apiRouter.HandleFunc("/login", apiLoginPOST).Methods("POST")
 	apiRouter.HandleFunc("/register", apiRegisterPOST).Methods("POST")
 	apiAuthenticatedRouter.HandleFunc("/me", apiMeGET).Methods("GET")
