@@ -1,0 +1,9 @@
+*, html, body {
+    background-color: #343a40;
+    color: white;
+}
+
+input {
+    border: #ffffff 2px solid;
+    border-radius: 4px;
+}

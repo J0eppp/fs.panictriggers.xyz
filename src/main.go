@@ -28,7 +28,7 @@ func logger(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			next.ServeHTTP(w, r)
-			fmt.Printf("[" + time.Now().Format(time.UnixDate) + "] " + r.RemoteAddr + " [" + r.Method + "] " + /*"[" +  + "] " +*/ r.URL.String() + "\n")
+			fmt.Printf("[" + time.Now().Format(time.UnixDate) + "] " + r.RemoteAddr + " [" + r.Method + "] " + /*"[" +  + "] " +*/ /*r.URL.String()*/ r.Host + r.URL.String() + "\n")
 		},
 	)
 }
@@ -85,6 +85,47 @@ func authenticate(next http.Handler) http.Handler {
 					Message: "Your session has been expired, please log back in!",
 				}
 				json.NewEncoder(w).Encode(res)
+				return
+			}
+
+			// Session is valid
+			next.ServeHTTP(w, r)
+		},
+	)
+}
+
+func authenticateFE(next http.Handler) http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			cookie, err := r.Cookie("sessionToken")
+
+			if err != nil  {
+				// sessionToken cookie is not set
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			}
+
+			if  len(cookie.Value) == 0 {
+				// sessionToken cookie is not set
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			}
+
+			// Check the expire time in the db, might have edited the cookie
+			rows, _ := db.DB.Query("SELECT id, session_expires FROM users WHERE session_token = ?", cookie.Value)
+			defer rows.Close()
+			rows.Next()
+			var id int64
+			var sessionExpires int64
+			rows.Scan(&id, &sessionExpires)
+			if id == 0 {
+				// Invalid session token
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			}
+			if time.Now().Unix() >= sessionExpires {
+				// Session has indeed been expired
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			}
 
@@ -447,10 +488,24 @@ func main() {
 
 	router := mux.NewRouter().StrictSlash(true)
 
+	authenticatedRouter := router.PathPrefix("/").Subrouter()
+	authenticatedRouter.Use(authenticateFE)
+
 	apiRouter := router.PathPrefix("/api").Subrouter()
+
 	apiAuthenticatedRouter := router.PathPrefix("/api").Subrouter()
 	apiAuthenticatedRouter.Use(authenticate)
+
 	apiRouter.HandleFunc("/", apiGET).Methods("GET")
+
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/index.html")
+	}).Methods("GET")
+
+	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/login/index.html")
+	}).Methods("GET")
+
 	apiRouter.HandleFunc("/login", apiLoginPOST).Methods("POST")
 	apiAuthenticatedRouter.HandleFunc("/me", apiMeGET).Methods("GET")
 	apiAuthenticatedRouter.HandleFunc("/me/files", apiMeFilesGET).Methods("GET")
@@ -458,9 +513,11 @@ func main() {
 	apiAuthenticatedRouter.HandleFunc("/file", apiFileGET).Methods("GET")
 	apiAuthenticatedRouter.HandleFunc("/upload", apiUploadPOST).Methods("POST")
 
-	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./static/index.html")
-	})
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+
+	//router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	//	http.ServeFile(w, r, "./static/index.html")
+	//})
 
 	log.Fatal(http.ListenAndServe(":80", logger(router)))
 }

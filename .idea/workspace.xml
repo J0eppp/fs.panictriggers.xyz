@@ -20,7 +20,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a789453a-ad9d-4ee5-87be-92f237432947" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/static/css/index.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/static/css/login.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/static/fs.panictriggers.xyz.http" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/static/js/login.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/static/login/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/static/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,6 +39,9 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="HTML File" />
+        <option value="CSS File" />
+        <option value="JavaScript File" />
+        <option value="HTTP Request" />
       </list>
     </option>
   </component>
@@ -62,7 +73,40 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="settings.editor.selected.configurable" value="SQL Dialects" />
+  </component>
+  <component name="RestClientSettings">
+    <option name="REQUEST_HISTORY">
+      <list>
+        <RestClientRequest>
+          <option name="httpMethod" value="POST" />
+          <option name="urlBase" value="http://localhost:80/api/login" />
+          <option name="urlPath" value="" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="Content-Type" />
+                <option name="value" value="application/json" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="haveTextToSend" value="true" />
+          <option name="textToSend" value="{&#10;  &quot;username&quot;: &quot;J0eppp&quot;,&#10;  &quot;password&quot;: &quot;Test&quot;&#10;}" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="All in fs.panictriggers.xyz" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" path="$PROJECT_DIR$/src/static/fs.panictriggers.xyz.http">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="HTTP Request.All in fs.panictriggers.xyz" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
@@ -85,6 +129,22 @@
       <screen x="1360" y="228" width="1920" height="1080" />
     </state>
     <state x="1970" y="462" width="732" height="637" key="#Inspections/1360.228.1920.1080/0.255.1360.513@1360.228.1920.1080" timestamp="1598797962938" />
+    <state width="1831" height="278" key="GridCell.Tab.0.bottom" timestamp="1598867036432">
+      <screen x="1360" y="228" width="1920" height="1080" />
+    </state>
+    <state width="1831" height="278" key="GridCell.Tab.0.bottom/1360.228.1920.1080/0.255.1360.513@1360.228.1920.1080" timestamp="1598867036432" />
+    <state width="1831" height="278" key="GridCell.Tab.0.center" timestamp="1598867036432">
+      <screen x="1360" y="228" width="1920" height="1080" />
+    </state>
+    <state width="1831" height="278" key="GridCell.Tab.0.center/1360.228.1920.1080/0.255.1360.513@1360.228.1920.1080" timestamp="1598867036432" />
+    <state width="1831" height="278" key="GridCell.Tab.0.left" timestamp="1598867036431">
+      <screen x="1360" y="228" width="1920" height="1080" />
+    </state>
+    <state width="1831" height="278" key="GridCell.Tab.0.left/1360.228.1920.1080/0.255.1360.513@1360.228.1920.1080" timestamp="1598867036431" />
+    <state width="1831" height="278" key="GridCell.Tab.0.right" timestamp="1598867036432">
+      <screen x="1360" y="228" width="1920" height="1080" />
+    </state>
+    <state width="1831" height="278" key="GridCell.Tab.0.right/1360.228.1920.1080/0.255.1360.513@1360.228.1920.1080" timestamp="1598867036432" />
     <state x="1830" y="415" key="SettingsEditor" timestamp="1598810885489">
       <screen x="1360" y="228" width="1920" height="1080" />
     </state>

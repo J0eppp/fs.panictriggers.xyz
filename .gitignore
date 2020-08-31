@@ -17,3 +17,7 @@
 .idea
 files
 ./tempfile*
+
+localhost.key
+localhost.crt
+localhost.csr
