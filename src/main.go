@@ -467,7 +467,7 @@ func apiFileGET(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var serverName string = params["file"][0]
-	rows, _ = db.DB.Query("SELECT * FROM files WHERE server_name = ? AND owner = ? OR public = 1", serverName, uid)
+	rows, _ = db.DB.Query("SELECT * FROM files WHERE server_name = ? AND (owner = ? OR public = 1)", serverName, uid)
 	defer rows.Close()
 	rows.Next()
 

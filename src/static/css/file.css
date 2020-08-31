@@ -1,0 +1,10 @@
+#content {
+    border: 1px solid white;
+    border-radius: 5px;
+    width: 70%;
+    height: 80%;
+    /*text-align: center;*/
+    margin: auto;
+    margin-top: 20px;
+    padding: 10px;
+}
