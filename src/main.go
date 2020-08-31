@@ -659,11 +659,18 @@ func main() {
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 
-	//router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	//	http.ServeFile(w, r, "./static/index.html")
-	//})
+	if len(os.Args) > 1 {
+		if os.Args[1] == "--debug" {
+			log.Fatal(http.ListenAndServe(":80", router))
+		}
+	}
 
+	go func() {http.ListenAndServe(":80", http.HandlerFunc(redirectTLS))}()
 	log.Fatal(http.ListenAndServeTLS(":443", "/etc/letsencrypt/live/fs.panictriggers.xyz/fullchain.pem", "/etc/letsencrypt/live/fs.panictriggers.xyz/privkey.pem", router))
+}
+
+func redirectTLS(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "https://fs.panictriggers.xyz" + r.RequestURI, http.StatusMovedPermanently)
 }
 
 func dumpUsers() {
