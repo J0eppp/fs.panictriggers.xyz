@@ -663,7 +663,7 @@ func main() {
 	//	http.ServeFile(w, r, "./static/index.html")
 	//})
 
-	log.Fatal(http.ListenAndServe(":80", router))
+	log.Fatal(http.ListenAndServeTLS(":443", "/etc/letsencrypt/live/fs.panictriggers.xyz/fullchain.pem", "/etc/letsencrypt/live/fs.panictriggers.xyz/privkey.pem", router))
 }
 
 func dumpUsers() {
